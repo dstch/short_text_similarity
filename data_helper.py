@@ -2,7 +2,8 @@ class data_helper(object):
     def __init__(self):
         pass
 
-    def split_sentence(self, text):
+    @staticmethod
+    def split_sentence(text):
         pass
 
     @staticmethod

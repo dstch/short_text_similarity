@@ -1,6 +1,7 @@
 from gensim.models.word2vec import Word2Vec, LineSentence
 from gensim import corpora, models, similarities
 from data_helper import data_helper
+from distance_helper import distance_helper
 
 
 class word2vec_sim(object):
@@ -45,5 +46,23 @@ class word2vec_sim(object):
         model = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=num_topics)
         model.save(model_path)
 
-    def similarity(self):
-        pass
+    def get_word_vector(self, text, word2vec_model, tfidf_model):
+        split_text1 = data_helper.split_sentence(text)
+        vector = []
+        text_len = 0
+        for word in split_text1:
+            if word in word2vec_model.wv.vocab:
+                text_len += 1
+                # add word weight
+                vector += word2vec_model[word] * tfidf_model[word]
+        vector /= text_len
+        return vector
+
+    def similarity_word2vec_tfidf(self, text1, text2, word2vec_model, tfidf_model):
+        """
+        calculate similarity between text1 and text2 by word2vec with TF-IDF weights
+        :return:
+        """
+        vector1 = self.get_word_vector(text1, word2vec_model, tfidf_model)
+        vector2 = self.get_word_vector(text2, word2vec_model, tfidf_model)
+        return distance_helper.cos_distance(vector1, vector2)
